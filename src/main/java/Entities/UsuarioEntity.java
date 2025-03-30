@@ -1,5 +1,7 @@
 package Entities;
 
+import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -11,28 +13,25 @@ public class UsuarioEntity {
     private String apellido;
     private Integer dni; ///UNQ
     private String email; ///UNQ
-    private LocalDateTime fechaCreacion;
+    private LocalDate fecha_creacion;
     private ArrayList<CuentaEntity> cuentas;
-    private CredencialEntity credencial;
 
-    public UsuarioEntity(Integer id_usuario, String nombre, String apellido, Integer dni, String email, LocalDateTime fechaCreacion,CredencialEntity credencial) {
+    public UsuarioEntity(Integer id_usuario, String nombre, String apellido, Integer dni, String email, LocalDate fechaCreacion) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.apellido = apellido;
         this.dni = dni;
         this.email = email;
-        this.fechaCreacion = fechaCreacion;
+        this.fecha_creacion = fechaCreacion;
         this.cuentas = new ArrayList<CuentaEntity>();
-        this.credencial = credencial;
     }
-    public UsuarioEntity (String nombre, String apellido, Integer dni,String email,CredencialEntity credencial){
+    public UsuarioEntity (String nombre, String apellido, Integer dni,String email){
         this.nombre = nombre;
         this.apellido = apellido;
         this.dni = dni;
         this.email = email;
-        this.fechaCreacion = LocalDateTime.now();
+        this.fecha_creacion = LocalDate.now();
         this.cuentas = new ArrayList<CuentaEntity>();
-        this.credencial = credencial;
     }
     public UsuarioEntity(){
         id_usuario = 0;
@@ -40,9 +39,8 @@ public class UsuarioEntity {
         apellido = "";
         dni = 0;
         email = "";
-        fechaCreacion = null;
+        fecha_creacion = null;
         cuentas = new ArrayList<CuentaEntity>();
-        credencial = null;
     }
 
     public Integer getId_usuario() {
@@ -85,12 +83,12 @@ public class UsuarioEntity {
         this.email = email;
     }
 
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
+    public LocalDate getFecha_creacion() {
+        return fecha_creacion;
     }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
+    public void setFecha_creacion(LocalDate fecha_creacion) {
+        this.fecha_creacion = fecha_creacion;
     }
 
     public ArrayList<CuentaEntity> getCuentas() {
@@ -101,14 +99,6 @@ public class UsuarioEntity {
         this.cuentas = cuentas;
     }
 
-    public CredencialEntity getCredencial() {
-        return credencial;
-    }
-
-    public void setCredencial(CredencialEntity credencial) {
-        this.credencial = credencial;
-    }
-
     @Override
     public String toString() {
         return "UsuarioEntity{" +
@@ -117,11 +107,15 @@ public class UsuarioEntity {
                 ", apellido='" + apellido + '\'' +
                 ", dni=" + dni +
                 ", email='" + email + '\'' +
-                ", fechaCreacion=" + fechaCreacion +
+                ", fechaCreacion=" + fecha_creacion +
                 ", cuentas=" + cuentas +
-                ", credencial=" + credencial +
                 '}';
     }
+
+    /*public UsuarioEntity resultToUsuario(ResultSet rs){
+        UsuarioEntity usuarioEntity = new UsuarioEntity();
+        return usuarioEntity;
+    }*/
 
     @Override
     public boolean equals(Object o) {
@@ -129,7 +123,6 @@ public class UsuarioEntity {
         UsuarioEntity that = (UsuarioEntity) o;
         return Objects.equals(id_usuario, that.id_usuario) && Objects.equals(dni, that.dni) && Objects.equals(email, that.email);
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(id_usuario, dni, email);

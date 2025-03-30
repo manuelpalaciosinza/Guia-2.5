@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public class CuentaRepository implements IRepository<CuentaEntity> {
 
-    private CuentaRepository instance;
+    private static CuentaRepository instance;
     private CuentaRepository(){}
-    public CuentaRepository getInstanceOf(){
+    public static CuentaRepository getInstanceOf(){
         if(instance == null)
         {
             instance = new CuentaRepository();
@@ -40,6 +40,11 @@ public class CuentaRepository implements IRepository<CuentaEntity> {
 
     @Override
     public void save(CuentaEntity cuentaEntity) throws SQLException {
+
+    }
+
+    @Override
+    public void update(int id) throws SQLException {
 
     }
 }

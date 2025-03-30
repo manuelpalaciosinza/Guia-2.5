@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class CredencialRepository implements IRepository<CredencialEntity>{
-    private CredencialRepository instance;
+    private static CredencialRepository instance;
     private CredencialRepository(){}
-    public CredencialRepository getInstanceOf(){
+    public static CredencialRepository getInstanceOf(){
         if (instance == null){
             instance = new CredencialRepository();
         }
@@ -40,4 +40,10 @@ public class CredencialRepository implements IRepository<CredencialEntity>{
     public Integer count() {
         return 0;
     }
+
+    @Override
+    public void update(int id) throws SQLException {
+
+    }
 }
+
