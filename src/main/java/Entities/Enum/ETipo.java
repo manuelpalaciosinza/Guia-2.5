@@ -1,4 +1,4 @@
-package Entities;
+package Entities.Enum;
 
 public enum ETipo {
     CAJA_AHORRO("CAJA_AHORRO"),

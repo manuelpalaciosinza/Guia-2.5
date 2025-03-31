@@ -1,5 +1,8 @@
-package Entities;
+package Entities.Classes;
 
+import Entities.Enum.ETipo;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class CuentaEntity {
@@ -7,9 +10,9 @@ public class CuentaEntity {
     private Integer id_usuario; ///FK
     private ETipo tipo_cuenta;
     private Float saldo;
-    private LocalDateTime fecha_creacion;
+    private LocalDate fecha_creacion;
 
-    public CuentaEntity(Integer id_cuenta, Integer id_usuario, ETipo tipo_cuenta, Float saldo, LocalDateTime fecha_creacion) {
+    public CuentaEntity(Integer id_cuenta, Integer id_usuario, ETipo tipo_cuenta, Float saldo, LocalDate fecha_creacion) {
         this.id_cuenta = id_cuenta;
         this.id_usuario = id_usuario;
         this.tipo_cuenta = tipo_cuenta;
@@ -21,7 +24,7 @@ public class CuentaEntity {
         this.id_usuario = id_usuario;
         this.tipo_cuenta = tipo_cuenta;
         this.saldo = saldo;
-        fecha_creacion = LocalDateTime.now();
+        fecha_creacion = null;
     }
     public CuentaEntity(){
         id_cuenta = 0;
@@ -63,11 +66,22 @@ public class CuentaEntity {
         this.saldo = saldo;
     }
 
-    public LocalDateTime getFecha_creacion() {
+    public LocalDate getFecha_creacion() {
         return fecha_creacion;
     }
 
-    public void setFecha_creacion(LocalDateTime fecha_creacion) {
+    public void setFecha_creacion(LocalDate fecha_creacion) {
         this.fecha_creacion = fecha_creacion;
+    }
+
+    @Override
+    public String toString() {
+        return "CuentaEntity{" +
+                "id_cuenta=" + id_cuenta +
+                ", id_usuario=" + id_usuario +
+                ", tipo_cuenta=" + tipo_cuenta +
+                ", saldo=" + saldo +
+                ", fecha_creacion=" + fecha_creacion +
+                '}';
     }
 }

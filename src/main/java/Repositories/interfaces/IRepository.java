@@ -1,4 +1,4 @@
-package Repositories;
+package Repositories.interfaces;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,6 +11,6 @@ public interface IRepository <T> {
     public ArrayList<T> findAll()throws SQLException;
     public Optional<T> findById (Integer id) throws SQLException;
     public Integer count() throws SQLException;
-    public void update(int id)throws  SQLException;
+    public void update(T t)throws  SQLException;
 
 }

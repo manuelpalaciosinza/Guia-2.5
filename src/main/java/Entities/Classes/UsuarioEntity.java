@@ -1,8 +1,6 @@
-package Entities;
+package Entities.Classes;
 
-import java.sql.ResultSet;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -30,7 +28,7 @@ public class UsuarioEntity {
         this.apellido = apellido;
         this.dni = dni;
         this.email = email;
-        this.fecha_creacion = LocalDate.now();
+        this.fecha_creacion = null;
         this.cuentas = new ArrayList<CuentaEntity>();
     }
     public UsuarioEntity(){

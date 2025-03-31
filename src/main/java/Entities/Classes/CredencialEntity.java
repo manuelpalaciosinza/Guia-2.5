@@ -1,4 +1,6 @@
-package Entities;
+package Entities.Classes;
+
+import Entities.Enum.EPermiso;
 
 public class CredencialEntity {
 
@@ -69,5 +71,16 @@ public class CredencialEntity {
 
     public void setPermiso(EPermiso permiso) {
         this.permiso = permiso;
+    }
+
+    @Override
+    public String toString() {
+        return "CredencialEntity{" +
+                "id_credencial=" + id_credencial +
+                ", id_usuario=" + id_usuario +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", permiso=" + permiso +
+                '}';
     }
 }
