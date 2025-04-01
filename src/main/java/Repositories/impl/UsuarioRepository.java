@@ -23,12 +23,17 @@ public class UsuarioRepository implements IRepository<UsuarioEntity> {
     public void save(UsuarioEntity usuarioEntity) throws SQLException {
         String sql = "INSERT INTO usuarios (nombre,apellido,dni,email) VALUES(?,?,?,?)";
         try (Connection connection = SQLiteConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1,usuarioEntity.getNombre());
             ps.setString(2,usuarioEntity.getApellido());
             ps.setInt(3,usuarioEntity.getDni());
             ps.setString(4,usuarioEntity.getEmail());
             ps.executeUpdate();
+            try(ResultSet rs = ps.getGeneratedKeys()){
+                if(rs.next()){
+                    usuarioEntity.setId_usuario(rs.getInt(1));
+                }
+            }
         }
     }
 

@@ -12,9 +12,10 @@ public class UsuarioEntity {
     private Integer dni; ///UNQ
     private String email; ///UNQ
     private LocalDate fecha_creacion;
+    private CredencialEntity credencial;
     private ArrayList<CuentaEntity> cuentas;
 
-    public UsuarioEntity(Integer id_usuario, String nombre, String apellido, Integer dni, String email, LocalDate fechaCreacion) {
+    public UsuarioEntity(Integer id_usuario, String nombre, String apellido, Integer dni, String email, LocalDate fechaCreacion,CredencialEntity credencial) {
         this.id_usuario = id_usuario;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -22,6 +23,7 @@ public class UsuarioEntity {
         this.email = email;
         this.fecha_creacion = fechaCreacion;
         this.cuentas = new ArrayList<CuentaEntity>();
+        this.credencial = credencial;
     }
     public UsuarioEntity (String nombre, String apellido, Integer dni,String email){
         this.nombre = nombre;
@@ -30,6 +32,7 @@ public class UsuarioEntity {
         this.email = email;
         this.fecha_creacion = null;
         this.cuentas = new ArrayList<CuentaEntity>();
+        this.credencial = null;
     }
     public UsuarioEntity(){
         id_usuario = 0;
@@ -39,6 +42,7 @@ public class UsuarioEntity {
         email = "";
         fecha_creacion = null;
         cuentas = new ArrayList<CuentaEntity>();
+        credencial = null;
     }
 
     public Integer getId_usuario() {
@@ -97,6 +101,14 @@ public class UsuarioEntity {
         this.cuentas = cuentas;
     }
 
+    public CredencialEntity getCredencial() {
+        return credencial;
+    }
+
+    public void setCredencial(CredencialEntity credencial) {
+        this.credencial = credencial;
+    }
+
     @Override
     public String toString() {
         return "UsuarioEntity{" +
@@ -109,11 +121,6 @@ public class UsuarioEntity {
                 ", cuentas=" + cuentas +
                 '}';
     }
-
-    /*public UsuarioEntity resultToUsuario(ResultSet rs){
-        UsuarioEntity usuarioEntity = new UsuarioEntity();
-        return usuarioEntity;
-    }*/
 
     @Override
     public boolean equals(Object o) {

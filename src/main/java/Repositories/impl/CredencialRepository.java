@@ -114,5 +114,17 @@ public class CredencialRepository implements IRepository<CredencialEntity> {
             ps.executeUpdate();
         }
     }
+    public Optional<CredencialEntity> findByUsernameAndPass (String username,String password) throws SQLException{
+        String sql = "SELECT * FROM credenciales WHERE username = ? AND password = ? ";
+        try (Connection connection = SQLiteConnection.getConnection();
+        PreparedStatement ps = connection.prepareStatement(sql)){
+            try (ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    return resultToCredencial(rs);
+                }
+            }
+        }
+        return Optional.empty();
+    }
 }
 

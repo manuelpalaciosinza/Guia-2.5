@@ -77,6 +77,22 @@ public class CuentaRepository implements IRepository<CuentaEntity> {
         }
         return list;
     }
+    public ArrayList<CuentaEntity> findAllByIdUser(int userId) throws SQLException {
+        ArrayList<CuentaEntity> list = new ArrayList<>();
+        Optional<CuentaEntity> cuentaEntity = Optional.of(new CuentaEntity());
+        String sql = "SELECT * FROM cuentas WHERE id_usuario = ?";
+        try (Connection connection = SQLiteConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setInt(1,userId);
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next()){
+                    cuentaEntity = resultToCuenta(rs);
+                    cuentaEntity.ifPresent(list::add);
+                }
+            }
+        }
+        return list;
+    }
 
     @Override
     public void deleteById(Integer id) throws SQLException {

@@ -18,11 +18,11 @@ public class CredencialEntity {
         this.permiso = permiso;
     }
 
-    public CredencialEntity(Integer id_usuario, String username, EPermiso permiso) {
+    public CredencialEntity(Integer id_usuario, String username) {
         this.id_usuario = id_usuario;
         this.username = username;
         this.password = "1234"; ///Se genera automaticamente como 1234 cada vez que se crea una cuenta
-        this.permiso = permiso;
+        this.permiso = EPermiso.CLIENTE;
     }
 
     public CredencialEntity(){
