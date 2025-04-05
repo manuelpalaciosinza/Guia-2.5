@@ -59,7 +59,7 @@ public class UsuarioService {
 
     public UsuarioEntity iniciarSesion(String username, String password) {
         /// Guardar el usuario totalmente cargado en el menu
-        CredencialEntity credencial = new CredencialEntity();
+        CredencialEntity credencial;
         UsuarioEntity usuario = new UsuarioEntity();
         try {
             credencial = credencialRepository
@@ -68,7 +68,7 @@ public class UsuarioService {
             usuario = usuarioRepository
                     .findById(credencial.getId_usuario())
                     .orElseThrow(()->new NoSuchElementException("Usuario no encontrado"));
-            ArrayList<CuentaEntity> listaCuentas = new ArrayList<>();
+            ArrayList<CuentaEntity> listaCuentas;
             listaCuentas = cuentaRepository.
                     findAllByIdUser(usuario.getId_usuario());
             usuario.setCredencial(credencial);
@@ -87,7 +87,7 @@ public class UsuarioService {
             try {
                 listaUsuarios = usuarioRepository.findAll();
             } catch (SQLException e) {
-                System.out.println("Error: No se encuentran usuarios en el sistema");
+                System.out.println(e.getMessage());
             }
             return listaUsuarios.toString();
         }
@@ -106,7 +106,7 @@ public class UsuarioService {
                         filter(usuarioEntity -> usuarioEntity.getDni().equals(dni))
                         .findFirst();
             }catch (SQLException e){
-                System.out.println("Error: No se encuentran usuarios en el sistema");
+                System.out.println(e.getMessage());
             }
         }else {
             throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
@@ -124,28 +124,70 @@ public class UsuarioService {
                         filter(usuarioEntity -> usuarioEntity.getEmail().equals(email))
                         .findFirst();
             }catch (SQLException e){
-                System.out.println("Error: No se encuentran usuarios en el sistema");
+                System.out.println(e.getMessage());
             }
         }else {
             throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
         }
         return buscado;
     }
-
-    public void modificarDatosUsuario(UsuarioEntity logueado,String email, String nombre, String apellido){
-
-        if (logueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE)){
-            try {
-                logueado.setNombre(nombre);
-                logueado.setApellido(apellido);
-                logueado.setEmail(email);
-                usuarioRepository.update(logueado);
-                System.out.println("Informacion actualizada correctamente");
-            } catch (SQLException e) {
-                System.out.println("Error: Ya existe una cuenta asociada al email ingresado");
-            }
-        } else if (logueado.getCredencial().getPermiso().equals(EPermiso.GESTOR)) {
-
+    public void eliminarCuenta (UsuarioEntity logueado,Integer idAEliminar) throws NoAutorizadoException{
+        Optional<UsuarioEntity> usuarioABorrar = Optional.of(new UsuarioEntity());
+        switch (logueado.getCredencial().getPermiso()){
+            case CLIENTE:
+                throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
+            case GESTOR:
+                try {
+                    usuarioABorrar = usuarioRepository.findById(idAEliminar);
+                    if (usuarioABorrar.isPresent()) {
+                        Optional<CredencialEntity> credencial = credencialRepository.findByIdUser(usuarioABorrar.get().getId_usuario());
+                        if(credencial.isPresent()){
+                            usuarioABorrar.get().setCredencial(credencial.get());
+                            if (usuarioABorrar.get().getCredencial().getPermiso().equals(EPermiso.CLIENTE)) {
+                                usuarioRepository.deleteById(idAEliminar);
+                                credencialRepository.deleteByIdUser(idAEliminar);
+                                cuentaRepository.deleteByIdUser(idAEliminar);
+                                System.out.println("El usuario se elimino con exito");
+                            } else {
+                                throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
+                            }
+                        }
+                    } else {
+                        System.out.println("No se encontro un usuario con ese id");
+                    }
+                } catch (SQLException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+            case ADMINISTRADOR:
+                try {
+                    usuarioRepository.deleteById(idAEliminar);
+                    credencialRepository.deleteByIdUser(idAEliminar);
+                    cuentaRepository.deleteByIdUser(idAEliminar);
+                    System.out.println("El usuario se elimino con exito");
+                }catch (SQLException e){
+                    System.out.println("Error al conectarse a la base de datos");
+                }
+                break;
         }
     }
+
+    /*public void modificarDatosUsuario(UsuarioEntity logueado,String email, String nombre, String apellido){
+
+        switch (logueado.getCredencial().getPermiso()) {
+            case CLIENTE:
+                try {
+                    logueado.setNombre(nombre);
+                    logueado.setApellido(apellido);
+                    logueado.setEmail(email);
+                    usuarioRepository.update(logueado);
+                    System.out.println("Informacion actualizada correctamente");
+                } catch (SQLException e) {
+                    System.out.println("Error: Ya existe una cuenta asociada al email ingresado");
+                }
+                break;
+            case GESTOR:
+
+        }
+    } */
 }

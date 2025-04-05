@@ -103,6 +103,14 @@ public class CuentaRepository implements IRepository<CuentaEntity> {
             ps.executeUpdate();
         }
     }
+    public void deleteByIdUser(Integer idUser) throws SQLException {
+        String sql = "DELETE FROM cuentas WHERE id_usuario = ?";
+        try (Connection connection = SQLiteConnection.getConnection();
+        PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setInt(1,idUser);
+            ps.executeUpdate();
+        }
+    }
 
     @Override
     public void save(CuentaEntity cuentaEntity) throws SQLException {

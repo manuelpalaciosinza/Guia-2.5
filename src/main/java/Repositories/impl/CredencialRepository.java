@@ -54,6 +54,13 @@ public class CredencialRepository implements IRepository<CredencialEntity> {
             ps.setInt(1,id);
             ps.executeUpdate();
         }
+    }public void deleteByIdUser (Integer idUser) throws SQLException {
+        String sql = "DELETE FROM credenciales WHERE id_usuario = ?";
+        try (Connection connection = SQLiteConnection.getConnection();
+        PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setInt(1,idUser);
+            ps.executeUpdate();
+        }
     }
 
     @Override
@@ -78,6 +85,19 @@ public class CredencialRepository implements IRepository<CredencialEntity> {
         try (Connection connection = SQLiteConnection.getConnection();
         PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setInt(1,id);
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    return resultToCredencial(rs);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+    public Optional<CredencialEntity> findByIdUser(Integer idUser) throws SQLException{
+        String sql = "SELECT * FROM credenciales WHERE id_usuario = ?";
+        try (Connection connection = SQLiteConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setInt(1,idUser);
             try(ResultSet rs = ps.executeQuery()){
                 if (rs.next()){
                     return resultToCredencial(rs);

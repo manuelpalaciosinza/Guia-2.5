@@ -46,7 +46,9 @@ public class App {
                 System.out.println("Ingrese 1 para cerrar sesion" +
                         "\nIngrese 2 para ver todos los usuarios" +
                         "\nIngrese 3 para buscar un usuario por DNI" +
-                        "\nIngrese 4 para buscar un usuario por Email");
+                        "\nIngrese 4 para buscar un usuario por Email" +
+                        "\nIngrese 5 para modificar un usuario" +
+                        "\nIngrese 6 para eliminar un usuario");
                 int opcion = scanner.nextInt();
                 scanner.nextLine();
                 switch (opcion) {
@@ -83,6 +85,19 @@ public class App {
                                     System.out::println,
                                     () -> System.out.println("No existe usuario con ese Email")
                             );
+                        }catch (NoAutorizadoException e){
+                            System.out.println(e.getMessage());
+                        }
+                        break;
+                    case 5:
+                        System.out.println("En proceso");
+                        break;
+                    case 6:
+                        System.out.println("Ingrese la id del usuario a eliminar:");
+                        int idAEliminar = scanner.nextInt();
+                        scanner.nextLine();
+                        try {
+                            usuarioService.eliminarCuenta(usuarioLogueado,idAEliminar);
                         }catch (NoAutorizadoException e){
                             System.out.println(e.getMessage());
                         }
