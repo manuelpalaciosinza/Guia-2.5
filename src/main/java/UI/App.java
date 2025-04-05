@@ -48,7 +48,10 @@ public class App {
                         "\nIngrese 3 para buscar un usuario por DNI" +
                         "\nIngrese 4 para buscar un usuario por Email" +
                         "\nIngrese 5 para modificar un usuario" +
-                        "\nIngrese 6 para eliminar un usuario");
+                        "\nIngrese 6 para eliminar un usuario" +
+                        "\nIngrese 7 para ver las cuentas de un usuario" +
+                        "\nIngrese 8 para ver el saldo de todas las cuentas de un usuario" +
+                        "\nIngrese 9 para realizar un deposito");
                 int opcion = scanner.nextInt();
                 scanner.nextLine();
                 switch (opcion) {
@@ -99,6 +102,20 @@ public class App {
                         try {
                             usuarioService.eliminarCuenta(usuarioLogueado,idAEliminar);
                         }catch (NoAutorizadoException e){
+                            System.out.println(e.getMessage());
+                        }
+                        break;
+                    case 7:
+                        System.out.println("Cuentas del usuario: " + cuentaService.listaCuentasUsuario(usuarioLogueado));
+                        break;
+                    case 8:
+                        System.out.println("Saldo de todas las cuentas del usuario: " + cuentaService.calcularSaldoTotal(usuarioLogueado));
+                        break;
+                    case 9:
+                        try {
+                            cuentaService.depositarSaldo(usuarioLogueado);
+                        }
+                        catch (NoAutorizadoException e){
                             System.out.println(e.getMessage());
                         }
                         break;

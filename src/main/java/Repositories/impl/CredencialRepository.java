@@ -93,6 +93,7 @@ public class CredencialRepository implements IRepository<CredencialEntity> {
         }
         return Optional.empty();
     }
+    /// Lo reemplaze por retornar la lista entera y filtrarla con streams
     public Optional<CredencialEntity> findByIdUser(Integer idUser) throws SQLException{
         String sql = "SELECT * FROM credenciales WHERE id_usuario = ?";
         try (Connection connection = SQLiteConnection.getConnection();

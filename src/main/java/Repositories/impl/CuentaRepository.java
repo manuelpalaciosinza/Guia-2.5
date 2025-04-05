@@ -77,6 +77,7 @@ public class CuentaRepository implements IRepository<CuentaEntity> {
         }
         return list;
     }
+
     public ArrayList<CuentaEntity> findAllByIdUser(int userId) throws SQLException {
         ArrayList<CuentaEntity> list = new ArrayList<>();
         Optional<CuentaEntity> cuentaEntity = Optional.of(new CuentaEntity());
