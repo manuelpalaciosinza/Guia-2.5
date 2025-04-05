@@ -7,6 +7,7 @@ import Repositories.impl.CredencialRepository;
 import Repositories.impl.CuentaRepository;
 import Repositories.impl.UsuarioRepository;
 import Services.UsuarioService;
+import UI.App;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -14,8 +15,7 @@ import java.util.Optional;
 public class Main {
     public static void main (String [] args){
 
-        UsuarioService usuarioService = UsuarioService.getInstanceOf();
-        System.out.println(usuarioService.listarTodosUsuarios());
-
+        App aplicacion = new App();
+        aplicacion.iniciarApp();
     }
 }

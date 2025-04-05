@@ -26,6 +26,13 @@ public class CuentaEntity {
         this.saldo = saldo;
         fecha_creacion = null;
     }
+
+    public CuentaEntity(Integer id_usuario, Float saldo) {
+        this.id_usuario = id_usuario;
+        this.tipo_cuenta = ETipo.CUENTA_CORRIENTE;
+        this.saldo = saldo;
+        fecha_creacion = null;
+    }
     public CuentaEntity(){
         id_cuenta = 0;
         id_usuario = 0;

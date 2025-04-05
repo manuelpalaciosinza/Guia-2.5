@@ -67,7 +67,7 @@ public class UsuarioService {
                     .orElseThrow(()->new NoSuchElementException("Usuario no encontrado"));
             usuario = usuarioRepository
                     .findById(credencial.getId_usuario())
-                    .orElseThrow(()->new RuntimeException("Usuario no encontrado"));
+                    .orElseThrow(()->new NoSuchElementException("Usuario no encontrado"));
             ArrayList<CuentaEntity> listaCuentas = new ArrayList<>();
             listaCuentas = cuentaRepository.
                     findAllByIdUser(usuario.getId_usuario());
@@ -80,10 +80,10 @@ public class UsuarioService {
         return usuario;
     }
 
-    public String listarTodosUsuarios(UsuarioEntity usuario) throws NoAutorizadoException{
+    public String listarTodosUsuarios(UsuarioEntity logueado) throws NoAutorizadoException{
         ArrayList<UsuarioEntity> listaUsuarios = new ArrayList<>();
-        if(usuario.getCredencial().getPermiso().equals(EPermiso.ADMINISTRADOR) ||
-        usuario.getCredencial().equals(EPermiso.GESTOR)) {
+        if(logueado.getCredencial().getPermiso().equals(EPermiso.ADMINISTRADOR) ||
+        logueado.getCredencial().getPermiso().equals(EPermiso.GESTOR)) {
             try {
                 listaUsuarios = usuarioRepository.findAll();
             } catch (SQLException e) {
@@ -93,6 +93,59 @@ public class UsuarioService {
         }
         else {
              throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
+        }
+    }
+
+    public Optional<UsuarioEntity> buscarPorDni(Integer dni,UsuarioEntity logueado)throws NoAutorizadoException{
+        Optional<UsuarioEntity> buscado = Optional.of(new UsuarioEntity());
+        if (logueado.getCredencial().getPermiso().equals(EPermiso.ADMINISTRADOR) ||
+        logueado.getCredencial().getPermiso().equals(EPermiso.GESTOR)){
+            try {
+                ArrayList<UsuarioEntity> listaUsuarios = usuarioRepository.findAll();
+                buscado = listaUsuarios.stream().
+                        filter(usuarioEntity -> usuarioEntity.getDni().equals(dni))
+                        .findFirst();
+            }catch (SQLException e){
+                System.out.println("Error: No se encuentran usuarios en el sistema");
+            }
+        }else {
+            throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
+        }
+        return buscado;
+    }
+
+    public Optional<UsuarioEntity> buscarPorEmail(String email,UsuarioEntity logueado)throws NoAutorizadoException{
+        Optional<UsuarioEntity> buscado = Optional.of(new UsuarioEntity());
+        if (logueado.getCredencial().getPermiso().equals(EPermiso.ADMINISTRADOR) ||
+                logueado.getCredencial().getPermiso().equals(EPermiso.GESTOR)){
+            try {
+                ArrayList<UsuarioEntity> listaUsuarios = usuarioRepository.findAll();
+                buscado = listaUsuarios.stream().
+                        filter(usuarioEntity -> usuarioEntity.getEmail().equals(email))
+                        .findFirst();
+            }catch (SQLException e){
+                System.out.println("Error: No se encuentran usuarios en el sistema");
+            }
+        }else {
+            throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
+        }
+        return buscado;
+    }
+
+    public void modificarDatosUsuario(UsuarioEntity logueado,String email, String nombre, String apellido){
+
+        if (logueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE)){
+            try {
+                logueado.setNombre(nombre);
+                logueado.setApellido(apellido);
+                logueado.setEmail(email);
+                usuarioRepository.update(logueado);
+                System.out.println("Informacion actualizada correctamente");
+            } catch (SQLException e) {
+                System.out.println("Error: Ya existe una cuenta asociada al email ingresado");
+            }
+        } else if (logueado.getCredencial().getPermiso().equals(EPermiso.GESTOR)) {
+
         }
     }
 }

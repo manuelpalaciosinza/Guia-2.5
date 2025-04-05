@@ -118,6 +118,8 @@ public class CredencialRepository implements IRepository<CredencialEntity> {
         String sql = "SELECT * FROM credenciales WHERE username = ? AND password = ? ";
         try (Connection connection = SQLiteConnection.getConnection();
         PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1,username);
+            ps.setString(2,password);
             try (ResultSet rs = ps.executeQuery()){
                 if(rs.next()){
                     return resultToCredencial(rs);
