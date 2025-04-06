@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 public class CredencialService {
 
     private final CredencialRepository credencialRepository;
-    private final UsuarioRepository usuarioRepository;
     private static CredencialService instance;
 
     private CredencialService(){
         credencialRepository = CredencialRepository.getInstanceOf();
-        usuarioRepository = UsuarioRepository.getInstanceOf();
     }
 
     public static CredencialService getInstanceOf (){

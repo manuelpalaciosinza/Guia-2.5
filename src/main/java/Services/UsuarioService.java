@@ -198,7 +198,7 @@ public class UsuarioService {
         } catch (SQLException e) {
             System.out.println("Error en la conexion a la base de datos: " + e.getMessage());
         }
-        return null; ///Teniendo en cuenta que siempre hay usuarios en el sistema
+        return null; ///Teniendo en cuenta que siempre hay usuarios en el sistema, no deberia retornar nunca null
     }
 
     public List<UsuarioEntity> listadosPorSaldoTotal (UsuarioEntity usuarioLogueado) throws NoAutorizadoException {
