@@ -10,9 +10,7 @@ import Repositories.impl.CuentaRepository;
 import Repositories.impl.UsuarioRepository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CuentaService {
@@ -151,6 +149,20 @@ public class CuentaService {
         }catch (SQLException e){
             System.out.println("Error en la conexion a la base de datos: " + e.getMessage());
         }
+    }
+    public Map<String,Long> cantidadCuentasPorTipo (UsuarioEntity usuarioLogueado)throws NoAutorizadoException{
+        Map<String,Long> resultado = new HashMap<>();
+        if (usuarioLogueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE))
+        {
+            throw new NoAutorizadoException("El usuario no cuenta con los permisos necesarios para realizar esta accion");
+        }
+        try {
+            resultado = cuentaRepository.findAll().stream()
+                    .collect(Collectors.groupingBy(cuentaEntity -> cuentaEntity.getTipo_cuenta().name(),Collectors.counting()));
+        }catch (SQLException e){
+            System.out.println("Error en la conexion a la base de datos: " + e.getMessage());
+        }
+        return resultado;
     }
 }
 

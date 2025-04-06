@@ -47,7 +47,9 @@ public class UsuarioService {
             credencialRepository.save(credencial);
             CuentaEntity cuenta = new CuentaEntity(aRegistrar.getId_usuario(), ETipo.CAJA_AHORRO, 0.0f);
             cuentaRepository.save(cuenta);
-            System.out.println("Usuario registrado con exito");
+            System.out.println("Usuario registrado con exito" +
+                    "\nNombre de usuario: " + generarUsername(email) +
+                    "\nContrasenia: 1234");
         } catch (SQLException e) {
             System.out.println("Error al registrar el usuario: " + e.getMessage());
         }
