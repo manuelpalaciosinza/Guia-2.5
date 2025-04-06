@@ -11,9 +11,8 @@ import Repositories.impl.CuentaRepository;
 import Repositories.impl.UsuarioRepository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class UsuarioService {
 
@@ -172,6 +171,66 @@ public class UsuarioService {
                 }
                 break;
         }
+    }
+    public UsuarioEntity usuarioConMayorSaldo (UsuarioEntity usuarioLogueado) throws NoAutorizadoException{
+        if (!usuarioLogueado.getCredencial().getPermiso().equals(EPermiso.ADMINISTRADOR)){
+            throw new NoAutorizadoException("El usuario no esta autorizado a realizar esta accion");
+        }
+        Optional<UsuarioEntity> usuarioMayorSaldo = Optional.of(new UsuarioEntity());
+        try {
+            ArrayList<CuentaEntity> cuentas = cuentaRepository.findAll();
+            Map<Integer,Double> mapa = cuentas.stream().
+                    collect(Collectors.groupingBy(
+                            CuentaEntity::getId_usuario,
+                            Collectors.summingDouble(cuenta -> (double) cuenta.getSaldo())
+                    ));
+            ///Mapa donde voy a guardar solo el par clave-valor del mapa original cuyo valor sea el maximo, es decir el maximo monto
+            Optional<Map.Entry<Integer,Double>> maximoValor = mapa.entrySet().stream()
+                    .max(Map.Entry.comparingByValue());
+            if(maximoValor.isPresent()){
+                int id_usuarioMaximo = maximoValor.get().getKey();
+                usuarioMayorSaldo = usuarioRepository.findById(id_usuarioMaximo);
+                if(usuarioMayorSaldo.isPresent()){
+                    return usuarioMayorSaldo.get();
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error en la conexion a la base de datos: " + e.getMessage());
+        }
+        return null; ///Teniendo en cuenta que siempre hay usuarios en el sistema
+    }
+
+    public List<UsuarioEntity> listadosPorSaldoTotal (UsuarioEntity usuarioLogueado) throws NoAutorizadoException {
+        if (!usuarioLogueado.getCredencial().getPermiso().equals(EPermiso.ADMINISTRADOR)) {
+            throw new NoAutorizadoException("El usuario no esta autorizado a realizar esta accion");
+        }
+        try {
+            Map<Integer, Double> mapa = cuentaRepository.findAll()
+                    .stream().
+                    collect(Collectors.groupingBy(
+                            CuentaEntity::getId_usuario,
+                            Collectors.summingDouble(cuenta -> (double) cuenta.getSaldo())
+                    ));
+
+            // Ordenás los IDs por saldo de forma descendente
+            List<Integer> idsOrdenados = mapa.entrySet().stream() //Uso entry set para tener cada entrada del mapa, con su clave y valor y convierto eso en stream
+                    .sorted(Map.Entry.<Integer, Double>comparingByValue().reversed()) //Ordeno el stream segun el valor almacenado en cada entrada del mapa, que es el monto total (reversed para que sea de mayor a menor)
+                    .map(Map.Entry::getKey) ///Una vez ordenada, convierto cada entrada en su key, es decir el id del usuario. Asi pierdo el value de cada entrada, pero ya no lo necesito
+                    .toList(); //Retorno una lista con los ids de usuarios, que esta ordenada segun sus saldo
+
+            // Ahora, creo una lista y por cada Id de la lista anterior (ordenada) busco el usuario correspondiente
+            List<UsuarioEntity> usuariosOrdenados = new ArrayList<>();
+            for (Integer id : idsOrdenados) {
+                Optional<UsuarioEntity> usuario = usuarioRepository.findById(id);
+                usuario.ifPresent(usuariosOrdenados::add);
+            }
+            return usuariosOrdenados;
+
+        } catch (SQLException e) {
+            System.out.println("Ocurrio un problema con la conexion en la base de datos: " + e.getMessage());
+        }
+        return Collections.emptyList();
     }
 
     /*public void modificarDatosUsuario(UsuarioEntity logueado,String email, String nombre, String apellido){

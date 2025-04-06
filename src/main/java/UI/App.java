@@ -85,6 +85,12 @@ public class App {
                                 case 12:
                                     cantidadDeCuentasPorTipo(usuarioLogueado);
                                     break;
+                                case 13:
+                                    usuarioConMayorSaldo(usuarioLogueado);
+                                    break;
+                                case 14:
+                                    usuariosOrdenadosPorSaldo(usuarioLogueado);
+                                    break;
                                 default:
                                     System.out.println("Opcion ingresada invalida");
                                     break;
@@ -124,7 +130,9 @@ public class App {
                 "\nIngrese 9 para realizar un deposito" +
                 "\nIngrese 10 para realizar una transferencia" +
                 "\nIngrese 11 para ver la cantidad de usuarios por permiso" +
-                "\nIngrese 12 para ver la cantidad de cuentas por tipo");
+                "\nIngrese 12 para ver la cantidad de cuentas por tipo" +
+                "\nIngrese 13 para ver el usuario con mayor saldo en todas sus cuentas" +
+                "\nIngrese 14 para ver los usuarios ordenados por saldo");
         int opcion = scanner.nextInt();
         scanner.nextLine();
         return opcion;
@@ -211,6 +219,25 @@ public class App {
         try {
             Map<String,Long> cuentasPorTipo = cuentaService.cantidadCuentasPorTipo(usuarioLogueado);
             System.out.println(cuentasPorTipo.toString());
+        }catch (NoAutorizadoException e){
+            System.out.println(e.getMessage());
+        }
+    }
+    private void usuarioConMayorSaldo(UsuarioEntity usuarioLogueado){
+        try {
+            UsuarioEntity usuario = usuarioService.usuarioConMayorSaldo(usuarioLogueado);
+            if(usuario != null){
+                System.out.println("Usuario con mayor saldo: " + usuario.toString());
+            }else {
+                System.out.println("No existen usuarios en el sistema");
+            }
+        }catch (NoAutorizadoException e){
+            System.out.println(e.getMessage());
+        }
+    }
+    private void usuariosOrdenadosPorSaldo (UsuarioEntity usuarioLogueado){
+        try {
+            System.out.println("Lista de usuarios ordenada por sus saldos: " + usuarioService.listadosPorSaldoTotal(usuarioLogueado));
         }catch (NoAutorizadoException e){
             System.out.println(e.getMessage());
         }

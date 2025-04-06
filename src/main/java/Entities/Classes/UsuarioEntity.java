@@ -111,14 +111,13 @@ public class UsuarioEntity {
 
     @Override
     public String toString() {
-        return "UsuarioEntity{" +
+        return "\nUsuarioEntity{" +
                 "id_usuario=" + id_usuario +
                 ", nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
                 ", dni=" + dni +
                 ", email='" + email + '\'' +
                 ", fechaCreacion=" + fecha_creacion +
-                ", cuentas=" + cuentas +
                 '}';
     }
 
