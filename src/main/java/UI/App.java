@@ -11,10 +11,7 @@ import Services.CuentaService;
 import Services.UsuarioService;
 
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
 public class App {
 
@@ -71,13 +68,13 @@ public class App {
                                     eliminarUsuario(usuarioLogueado);
                                     break;
                                 case 7:
-                                    System.out.println("Cuentas del usuario: " + cuentaService.listaCuentasUsuario(usuarioLogueado));
+                                    verCuentasUsuario(usuarioLogueado);
                                     break;
                                 case 8:
-                                    System.out.println("Saldo de todas las cuentas del usuario: " + cuentaService.calcularSaldoTotal(usuarioLogueado));
+                                    verSaldoTotal(usuarioLogueado);
                                     break;
                                 case 9:
-                                    realizarDepositos(usuarioLogueado);
+                                    realizarDepositosCorregido(usuarioLogueado);
                                     break;
                                 case 11:
                                     cantidadDeUsuariosPorPermiso(usuarioLogueado);
@@ -200,13 +197,20 @@ public class App {
         }
     }
 
-    private void realizarDepositos(UsuarioEntity usuarioLogueado) {
+    private void realizarDepositosCorregido(UsuarioEntity usuarioLogueado){
         try {
-            cuentaService.depositarSaldo(usuarioLogueado);
-        } catch (NoAutorizadoException e) {
+            System.out.println("Ingrese la id de la cuenta a la que quiere depositar: ");
+            int id_cuenta = scanner.nextInt();
+            scanner.nextLine();
+            System.out.println("Ingrese el monto a depositar: ");
+            float monto = scanner.nextFloat();
+            scanner.nextLine();
+            cuentaService.depositarSaldoCorregido(usuarioLogueado,monto,id_cuenta);
+        }catch (NoAutorizadoException e){
             System.out.println(e.getMessage());
         }
     }
+
     private void cantidadDeUsuariosPorPermiso (UsuarioEntity usuarioLogueado){
         try {
             Map<String,Long> usuariosPorPermiso = credencialService.obtenerUsuariosPorPermiso(usuarioLogueado);
@@ -238,6 +242,26 @@ public class App {
     private void usuariosOrdenadosPorSaldo (UsuarioEntity usuarioLogueado){
         try {
             System.out.println("Lista de usuarios ordenada por sus saldos: " + usuarioService.listadosPorSaldoTotal(usuarioLogueado));
+        }catch (NoAutorizadoException e){
+            System.out.println(e.getMessage());
+        }
+    }
+    private void verCuentasUsuario(UsuarioEntity usuarioLogueado) {
+        System.out.println("Ingrese la id del usuario cuyas cuentas quiere ver: ");
+        int id_usuario = scanner.nextInt();
+        scanner.nextLine();
+        try {
+            System.out.println(cuentaService.listaCuentasUsuarioCorregido(usuarioLogueado, id_usuario));
+        } catch (NoAutorizadoException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    private void verSaldoTotal (UsuarioEntity usuarioLogueado){
+        System.out.println("Ingrese la id del usuario cuyo saldo total quiere conocer: ");
+        int id_usuario = scanner.nextInt();
+        scanner.nextLine();
+        try {
+            System.out.println("Saldo del usuario: " + cuentaService.calcularSaldoTotalCorregido(usuarioLogueado,id_usuario));
         }catch (NoAutorizadoException e){
             System.out.println(e.getMessage());
         }

@@ -30,96 +30,57 @@ public class CuentaService {
         return instance;
     }
 
-    public ArrayList<CuentaEntity> listaCuentasUsuario(UsuarioEntity logueado) {
+    public ArrayList<CuentaEntity> listaCuentasUsuarioCorregido (UsuarioEntity logueado,int id_usuario) throws NoAutorizadoException {
+        if (!logueado.getId_usuario().equals(id_usuario) && logueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE)) {
+                throw new NoAutorizadoException("El usuario no tiene permisos para ver cuentas ajenas");
+        }
         ArrayList<CuentaEntity> listaCuentas = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
-        if (!logueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE)) {
-            System.out.println("Ingrese la id del usuario cuyas cuentas quiere observar");
-            int idCliente = scanner.nextInt();
-            scanner.nextLine();
-            try {
-                listaCuentas = cuentaRepository.findAll().stream()
-                        .filter(cuentaEntity -> cuentaEntity.getId_usuario().equals(idCliente))
-                        .collect(Collectors.toCollection(ArrayList::new));
-            } catch (SQLException e) {
-                System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
-            }
-        } else {
-            try {
-                listaCuentas = cuentaRepository.findAll().stream()
-                        .filter(cuentaEntity -> cuentaEntity.getId_usuario().equals(logueado.getId_usuario()))
-                        .collect(Collectors.toCollection(ArrayList::new));
-            } catch (SQLException e) {
-                System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
-            }
+        try {
+            listaCuentas = cuentaRepository.findAll().stream()
+                    .filter(cuentaEntity -> cuentaEntity.getId_usuario().equals(id_usuario))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } catch (SQLException e) {
+            System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
         }
         return listaCuentas;
     }
 
-    public float calcularSaldoTotal(UsuarioEntity logueado) {
+    public float calcularSaldoTotalCorregido (UsuarioEntity logueado,int id_usuario) throws NoAutorizadoException {
         ArrayList<CuentaEntity> listaCuentas = new ArrayList<>();
         float saldoTotal = 0;
-        Scanner scanner = new Scanner(System.in);
-        if (!logueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE)) {
-            System.out.println("Ingrese la id del usuario cuyo saldo quiere observar");
-            int idCliente = scanner.nextInt();
-            scanner.nextLine();
-            try {
-                saldoTotal = cuentaRepository.findAll().stream()
-                        .filter(cuentaEntity -> cuentaEntity.getId_usuario().equals(idCliente))
-                        .map(CuentaEntity::getSaldo)
-                        .reduce(0.0f, Float::sum);
-            } catch (SQLException e) {
-                System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
-            }
-        } else {
-            try {
-                saldoTotal = cuentaRepository.findAll().stream()
-                        .filter(cuentaEntity -> cuentaEntity.getId_usuario().equals(logueado.getId_usuario()))
-                        .map(CuentaEntity::getSaldo)
-                        .reduce(0f,Float::sum);
-            } catch (SQLException e) {
-                System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
-            }
+        if (!logueado.getId_usuario().equals(id_usuario) && logueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE)) {
+           throw new NoAutorizadoException("El usuario solo puede ver el saldo de sus propias cuentas");
+        }
+        try {
+            saldoTotal = cuentaRepository.findAll().stream()
+                    .filter(cuentaEntity -> cuentaEntity.getId_usuario().equals(id_usuario))
+                    .map(CuentaEntity::getSaldo)
+                    .reduce(0.0f, Float::sum);
+        } catch (SQLException e) {
+            System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
         }
         return saldoTotal;
     }
-    public void depositarSaldo (UsuarioEntity logueado) throws NoAutorizadoException{
-        Scanner scanner = new Scanner(System.in);
-        int id_cuenta;
+
+    public void depositarSaldoCorregido (UsuarioEntity logueado,float monto, int id_cuenta) throws NoAutorizadoException{
         Optional<CuentaEntity> cuentaADepositar = Optional.of(new CuentaEntity());
-        float montoAdepositar;
         try {
             switch (logueado.getCredencial().getPermiso()) {
                 case CLIENTE:
-                    System.out.println("Listado de sus cuentas: " + listaCuentasUsuario(logueado));
-                    System.out.println("Ingrese el id de la cuenta a la que quiere depositar: ");
-                    id_cuenta = scanner.nextInt();
-                    scanner.nextLine();
                     cuentaADepositar = cuentaRepository.findById(id_cuenta);
                     if (cuentaADepositar.isPresent() && cuentaADepositar.get().getId_usuario().equals(logueado.getId_usuario())){
-                        System.out.println("Ingrese el monto a depositar: ");
-                        montoAdepositar = scanner.nextFloat();
-                        scanner.nextLine();
-                        cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + montoAdepositar);
+                        cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + monto);
                         cuentaRepository.update(cuentaADepositar.get());
                     }else {
-                        System.out.println("No existe cuenta con el id ingresado");
+                        throw new NoAutorizadoException("El usuario no esta autorizado para depositar a cuentas ajenas");
                     }
                     break;
                 case GESTOR:
-                    System.out.println("Listado de cuentas: " + cuentaRepository.findAll());
-                    System.out.println("Ingrese el id de la cuenta a la que quiere depositar: ");
-                    id_cuenta = scanner.nextInt();
-                    scanner.nextLine();
                     cuentaADepositar = cuentaRepository.findById(id_cuenta);
                     if (cuentaADepositar.isPresent()){
                         Optional<CredencialEntity> credencialADepositar = credencialRepository.findByIdUser(cuentaADepositar.get().getId_usuario());
                         if (credencialADepositar.isPresent() && credencialADepositar.get().getPermiso().equals(EPermiso.CLIENTE)) {
-                            System.out.println("Ingrese el monto a depositar: ");
-                            montoAdepositar = scanner.nextFloat();
-                            scanner.nextLine();
-                            cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + montoAdepositar);
+                            cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + monto);
                             cuentaRepository.update(cuentaADepositar.get());
                         }
                         else {
@@ -130,16 +91,9 @@ public class CuentaService {
                     }
                     break;
                 case ADMINISTRADOR:
-                    System.out.println("Listado de cuentas: " + cuentaRepository.findAll());
-                    System.out.println("Ingrese el id de la cuenta a la que quiere depositar: ");
-                    id_cuenta = scanner.nextInt();
-                    scanner.nextLine();
                     cuentaADepositar = cuentaRepository.findById(id_cuenta);
                     if (cuentaADepositar.isPresent()){
-                        System.out.println("Ingrese el monto a depositar: ");
-                        montoAdepositar = scanner.nextFloat();
-                        scanner.nextLine();
-                        cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + montoAdepositar);
+                        cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + monto);
                         cuentaRepository.update(cuentaADepositar.get());
                     }else {
                         System.out.println("No existe cuenta con el id ingresado");
