@@ -44,6 +44,16 @@ public class UsuarioEntity {
         cuentas = new ArrayList<CuentaEntity>();
         credencial = null;
     }
+    public UsuarioEntity(String nombre, String apellido, String email){
+        id_usuario = 0;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        dni = 0;
+        this.email = email;
+        fecha_creacion = null;
+        cuentas = null;
+        credencial = null;
+    }
 
     public Integer getId_usuario() {
         return id_usuario;

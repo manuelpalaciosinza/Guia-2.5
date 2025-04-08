@@ -88,6 +88,9 @@ public class App {
                                 case 14:
                                     usuariosOrdenadosPorSaldo(usuarioLogueado);
                                     break;
+                                case 15:
+                                    actualizarUsuario(usuarioLogueado);
+                                    break;
                                 default:
                                     System.out.println("Opcion ingresada invalida");
                                     break;
@@ -129,7 +132,8 @@ public class App {
                 "\nIngrese 11 para ver la cantidad de usuarios por permiso" +
                 "\nIngrese 12 para ver la cantidad de cuentas por tipo" +
                 "\nIngrese 13 para ver el usuario con mayor saldo en todas sus cuentas" +
-                "\nIngrese 14 para ver los usuarios ordenados por saldo");
+                "\nIngrese 14 para ver los usuarios ordenados por saldo" +
+                "\nIngrese 15 para modificar un usuario");
         int opcion = scanner.nextInt();
         scanner.nextLine();
         return opcion;
@@ -263,6 +267,27 @@ public class App {
         try {
             System.out.println("Saldo del usuario: " + cuentaService.calcularSaldoTotalCorregido(usuarioLogueado,id_usuario));
         }catch (NoAutorizadoException e){
+            System.out.println(e.getMessage());
+        }
+    }
+    private UsuarioEntity cargarUsuario (){
+        System.out.println("Ingrese el nuevo nombre: ");
+        String nombre = scanner.nextLine();
+        System.out.println("Ingrese el nuevo apellido: ");
+        String apellido = scanner.nextLine();
+        System.out.println("Ingrese el nuevo email: ");
+        String email = scanner.nextLine();
+        return new UsuarioEntity(nombre,apellido,email);
+    }
+    private void actualizarUsuario (UsuarioEntity usuarioLogueado){
+        System.out.println("Ingrese la id del usuario a modificar: ");
+        int id_mod = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Ingrese los nuevos datos del usuario: ");
+        UsuarioEntity usuarioModificado = cargarUsuario();
+        try {
+            usuarioService.modificarUsuario(usuarioLogueado,id_mod,usuarioModificado);
+        } catch (NoAutorizadoException e) {
             System.out.println(e.getMessage());
         }
     }

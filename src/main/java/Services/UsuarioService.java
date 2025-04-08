@@ -213,7 +213,7 @@ public class UsuarioService {
                             Collectors.summingDouble(cuenta -> (double) cuenta.getSaldo())
                     ));
 
-            // Ordenás los IDs por saldo de forma descendente
+            // Ordeno los IDs por saldo de forma descendente
             List<Integer> idsOrdenados = mapa.entrySet().stream() //Uso entry set para tener cada entrada del mapa, con su clave y valor y convierto eso en stream
                     .sorted(Map.Entry.<Integer, Double>comparingByValue().reversed()) //Ordeno el stream segun el valor almacenado en cada entrada del mapa, que es el monto total (reversed para que sea de mayor a menor)
                     .map(Map.Entry::getKey) ///Una vez ordenada, convierto cada entrada en su key, es decir el id del usuario. Asi pierdo el value de cada entrada, pero ya no lo necesito
@@ -233,22 +233,52 @@ public class UsuarioService {
         return Collections.emptyList();
     }
 
-    /*public void modificarDatosUsuario(UsuarioEntity logueado,String email, String nombre, String apellido){
-
-        switch (logueado.getCredencial().getPermiso()) {
-            case CLIENTE:
-                try {
-                    logueado.setNombre(nombre);
-                    logueado.setApellido(apellido);
-                    logueado.setEmail(email);
-                    usuarioRepository.update(logueado);
-                    System.out.println("Informacion actualizada correctamente");
-                } catch (SQLException e) {
-                    System.out.println("Error: Ya existe una cuenta asociada al email ingresado");
-                }
-                break;
-            case GESTOR:
-
+    /// Metodo que recibe el usuario que quiero modificar
+    /// y un usuario previamente cargado con los datos nuevos
+    /// Realiza una verificacion de que el email ingresado no sea repetido
+    /// y si no lo es, retorna true significando que se realizo la modificacion
+    /// Caso contrario, retorna false
+    private boolean actualizarUsuario (UsuarioEntity usuarioViejo, UsuarioEntity usuarioModificado){
+        ArrayList<UsuarioEntity> verificarEmail = new ArrayList<>();
+        try {
+            verificarEmail = usuarioRepository.findAll().stream()
+                    .filter(usuario -> usuario.getEmail().equals(usuarioModificado.getEmail()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } catch (SQLException e) {
+            System.out.println("Error en la conexion con la base de datos: "+e.getMessage());
         }
-    } */
+        if (verificarEmail.isEmpty()) {
+            usuarioViejo.setNombre(usuarioModificado.getNombre());
+            usuarioViejo.setApellido(usuarioModificado.getApellido());
+            usuarioViejo.setEmail(usuarioModificado.getEmail());
+            return true;
+        }
+        return false;
+    }
+
+    public void modificarUsuario(UsuarioEntity usuarioLogueado, int idUsuarioAMod, UsuarioEntity usuarioModificado) throws NoAutorizadoException {
+        try {
+            Optional<UsuarioEntity> usuarioBuscado = usuarioRepository.findById(idUsuarioAMod);
+            if (usuarioBuscado.isPresent()) {
+                Optional <CredencialEntity> credencialUsuarioBuscado = credencialRepository.findByIdUser(idUsuarioAMod);
+                credencialUsuarioBuscado.ifPresent(credencialEntity -> usuarioBuscado.get().setCredencial(credencialEntity));
+                if (usuarioLogueado.getCredencial().getPermiso().equals(EPermiso.CLIENTE) && idUsuarioAMod != usuarioLogueado.getId_usuario()) {
+                    throw new NoAutorizadoException("El usuario no tiene permisos para modificar datos de usuarios ajenos");
+                } else if (usuarioLogueado.getCredencial().getPermiso().equals(EPermiso.GESTOR) && !usuarioBuscado.get().getCredencial().getPermiso().equals(EPermiso.CLIENTE)) {
+                    throw new NoAutorizadoException("El gestor solo puede modificar los datos de usuarios");
+                }
+                if (actualizarUsuario(usuarioBuscado.get(), usuarioModificado)) {
+                    usuarioRepository.update(usuarioBuscado.get());
+                    System.out.println("El usuario se modifico con exito");
+                } else {
+                    System.out.println("El email ingresado se encuentra asociado a la cuenta de otro usuario");
+                }
+            }
+            else {
+                System.out.println("El usuario buscado no existe");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error en la conexion con la base de datos: " + e.getMessage());
+        }
+    }
 }

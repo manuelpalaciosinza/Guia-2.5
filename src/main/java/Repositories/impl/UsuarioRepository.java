@@ -104,15 +104,14 @@ public class UsuarioRepository implements IRepository<UsuarioEntity> {
 
     @Override
     public void update(UsuarioEntity usuarioEntity) throws SQLException {
-       String sql = "UPDATE usuarios SET nombre = ?,apellido = ?,dni = ?,email = ?,fecha_creacion = ? WHERE id_usuario = ? ";
+       String sql = "UPDATE usuarios SET nombre = ?,apellido = ?,dni = ?,email = ? WHERE id_usuario = ? ";
        try(Connection connection = SQLiteConnection.getConnection();
        PreparedStatement ps = connection.prepareStatement(sql)){
            ps.setString(1,usuarioEntity.getNombre());
            ps.setString(2,usuarioEntity.getApellido());
            ps.setInt(3,usuarioEntity.getDni());
            ps.setString(4,usuarioEntity.getEmail());
-           ps.setDate(5, Date.valueOf(usuarioEntity.getFecha_creacion()));
-           ps.setInt(6,usuarioEntity.getId_usuario());
+           ps.setInt(5,usuarioEntity.getId_usuario());
            ps.executeUpdate();
        }
     }

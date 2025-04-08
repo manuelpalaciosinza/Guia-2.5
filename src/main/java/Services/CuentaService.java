@@ -79,7 +79,7 @@ public class CuentaService {
                     cuentaADepositar = cuentaRepository.findById(id_cuenta);
                     if (cuentaADepositar.isPresent()){
                         Optional<CredencialEntity> credencialADepositar = credencialRepository.findByIdUser(cuentaADepositar.get().getId_usuario());
-                        if (credencialADepositar.isPresent() && credencialADepositar.get().getPermiso().equals(EPermiso.CLIENTE)) {
+                        if (credencialADepositar.isPresent() && credencialADepositar.get().getPermiso().equals(EPermiso.GESTOR)) {
                             cuentaADepositar.get().setSaldo(cuentaADepositar.get().getSaldo() + monto);
                             cuentaRepository.update(cuentaADepositar.get());
                         }
